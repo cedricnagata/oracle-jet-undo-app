@@ -1,4 +1,3 @@
-// Import Core Pack components
 import "oj-c/form-layout";
 import "oj-c/input-text";
 import "oj-c/text-area";
@@ -9,20 +8,51 @@ import { useState } from "preact/hooks";
 // Define the FormBuilder Component
 const FormBuilder: FunctionalComponent = () => {
   const [formElements, setFormElements] = useState<Array<{ id: string; type: string }>>([]);
+  const [undoStack, setUndoStack] = useState<Array<Array<{ id: string; type: string }>>>([]);
+  const [redoStack, setRedoStack] = useState<Array<Array<{ id: string; type: string }>>>([]);
+
+  // Save current form state to undo stack
+  const saveState = () => {
+    setUndoStack([...undoStack, [...formElements]]);
+    setRedoStack([]); // Clear redo stack when new changes happen
+  };
 
   // Function to add a new text input field
   const addTextInput = () => {
+    saveState();
     setFormElements([...formElements, { id: `TextInput-${formElements.length + 1}`, type: "input" }]);
   };
 
   // Function to add a new text area field
   const addTextArea = () => {
+    saveState();
     setFormElements([...formElements, { id: `TextArea-${formElements.length + 1}`, type: "textarea" }]);
   };
 
   // Function to delete a form element
   const deleteElement = (id: string) => {
+    saveState();
     setFormElements(formElements.filter((element) => element.id !== id));
+  };
+
+  // Undo last action
+  const undo = () => {
+    if (undoStack.length > 0) {
+      const lastState = undoStack[undoStack.length - 1];
+      setRedoStack([formElements, ...redoStack]); // Push current state to redo stack
+      setFormElements(lastState); // Restore last state
+      setUndoStack(undoStack.slice(0, -1)); // Remove last state from undo stack
+    }
+  };
+
+  // Redo last undone action
+  const redo = () => {
+    if (redoStack.length > 0) {
+      const nextState = redoStack[0];
+      setUndoStack([...undoStack, formElements]); // Push current state to undo stack
+      setFormElements(nextState); // Restore next state
+      setRedoStack(redoStack.slice(1)); // Remove first state from redo stack
+    }
   };
 
   return (
@@ -39,6 +69,23 @@ const FormBuilder: FunctionalComponent = () => {
         <oj-c-button
           onojAction={addTextArea}
           label="Add Text Area"
+          style="margin-right: 10px;"
+        ></oj-c-button>
+      </div>
+
+      {/* Undo and Redo Buttons */}
+      <div style={{ marginBottom: "20px" }}>
+        <oj-c-button
+          onojAction={undo}
+          label="Undo"
+          style="margin-right: 10px;"
+          disabled={undoStack.length === 0}
+        ></oj-c-button>
+        <oj-c-button
+          onojAction={redo}
+          label="Redo"
+          style="margin-right: 10px;"
+          disabled={redoStack.length === 0}
         ></oj-c-button>
       </div>
 
