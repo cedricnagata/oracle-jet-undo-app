@@ -19,7 +19,7 @@ import "oj-c/input-text";
 import "oj-c/select-single";
 import "oj-c/checkboxset";
 
-type FormElementType = 'text' | 'textarea' | 'checkbox' | 'select';
+type FormElementType = 'text' | 'textarea' | 'select';
 
 interface FormElement {
   id: string;
@@ -65,7 +65,7 @@ export function FormBuilder() {
     const elementData = {
       type: selectedType,
       label: newElementLabel,
-      value: selectedType === 'checkbox' ? [] : ''
+      value: ''
     };
 
     setFormElements(prevElements => {
@@ -112,9 +112,6 @@ export function FormBuilder() {
       
       case 'textarea':
         return <oj-c-text-area {...commonProps} rows={3} />;
-      
-      case 'checkbox':
-        return <oj-c-checkboxset {...commonProps} data={optionsDP} />;
       
       case 'select':
         return <oj-c-select-single {...commonProps} data={optionsDP} />;
@@ -181,7 +178,6 @@ export function FormBuilder() {
             >
               <oj-option value="text">Text Input</oj-option>
               <oj-option value="textarea">Text Area</oj-option>
-              <oj-option value="checkbox">Checkbox</oj-option>
               <oj-option value="select">Select</oj-option>
             </oj-radioset>
           </oj-form-layout>
