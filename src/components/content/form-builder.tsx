@@ -1,15 +1,16 @@
 import "oj-c/form-layout";
 import "oj-c/input-text";
 import "oj-c/text-area";
+import "oj-c/checkbox";
 import "oj-c/button";
 import { FunctionalComponent, h } from "preact";
 import { useState } from "preact/hooks";
 
 // Define the FormBuilder Component
 const FormBuilder: FunctionalComponent = () => {
-  const [formElements, setFormElements] = useState<Array<{ id: string; type: string }>>([]);
-  const [undoStack, setUndoStack] = useState<Array<Array<{ id: string; type: string }>>>([]);
-  const [redoStack, setRedoStack] = useState<Array<Array<{ id: string; type: string }>>>([]);
+  const [formElements, setFormElements] = useState<Array<{ id: string; type: string; options?: string[] }>>([]);
+  const [undoStack, setUndoStack] = useState<Array<Array<{ id: string; type: string; options?: string[] }>>>([]);
+  const [redoStack, setRedoStack] = useState<Array<Array<{ id: string; type: string; options?: string[] }>>>([]);
 
   // Save current form state to undo stack
   const saveState = () => {
@@ -27,6 +28,16 @@ const FormBuilder: FunctionalComponent = () => {
   const addTextArea = () => {
     saveState();
     setFormElements([...formElements, { id: `TextArea-${formElements.length + 1}`, type: "textarea" }]);
+  };
+
+  // Function to add a new checkbox field with multiple options
+  const addCheckbox = () => {
+    saveState();
+    setFormElements([...formElements, {
+      id: `Checkbox-${formElements.length + 1}`,
+      type: "checkbox",
+      options: ["Option 1", "Option 2", "Option 3"], // Predefined options
+    }]);
   };
 
   // Function to delete a form element
@@ -71,6 +82,11 @@ const FormBuilder: FunctionalComponent = () => {
           label="Add Text Area"
           style="margin-right: 10px;"
         ></oj-c-button>
+        <oj-c-button
+          onojAction={addCheckbox}
+          label="Add Checkbox Group"
+          style="margin-right: 10px;"
+        ></oj-c-button>
       </div>
 
       {/* Undo and Redo Buttons */}
@@ -105,6 +121,14 @@ const FormBuilder: FunctionalComponent = () => {
                 label-hint={`Field ${element.id}`}
                 placeholder={`Enter value for ${element.id}`}
               ></oj-c-text-area>
+            )}
+            {element.type === "checkbox" && element.options && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <label>{`Select options for ${element.id}`}</label>
+                {element.options.map((option, index) => (
+                  <oj-c-checkbox key={index} label-hint={option}></oj-c-checkbox>
+                ))}
+              </div>
             )}
             {/* Delete button */}
             <oj-c-button
