@@ -3,8 +3,10 @@ import "oj-c/input-text";
 import "oj-c/text-area";
 import "oj-c/checkbox";
 import "oj-c/button";
+import "oj-c/select-single"
 import { FunctionalComponent, h } from "preact";
 import { useState } from "preact/hooks";
+import ArrayDataProvider = require('ojs/ojarraydataprovider');
 
 // Define the FormBuilder Component
 const FormBuilder: FunctionalComponent = () => {
@@ -40,6 +42,24 @@ const FormBuilder: FunctionalComponent = () => {
     }]);
   };
 
+  const browsers = [
+    { value: 'IE', label: 'Internet Explorer' },
+    { value: 'FF', label: 'Firefox' },
+    { value: 'CH', label: 'Chrome' },
+    { value: 'OP', label: 'Opera' },
+    { value: 'SA', label: 'Safari' },
+  ];
+
+  const browsersDP = new ArrayDataProvider(browsers, {
+    keyAttributes: 'value',
+  });
+
+  // Function to add a new text area field
+  const addSelectSingle = () => {
+    saveState();
+    setFormElements([...formElements, { id: `SelectSingle-${formElements.length + 1}`, type: "select-single" }]);
+  };
+
   // Function to delete a form element
   const deleteElement = (id: string) => {
     saveState();
@@ -67,8 +87,8 @@ const FormBuilder: FunctionalComponent = () => {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Dynamic Form Builder</h1>
+    <div style={{ padding: "20px"}}>
+      <h1>Form Builder</h1>
 
       {/* Buttons to add form elements */}
       <div style={{ marginBottom: "20px" }}>
@@ -85,6 +105,11 @@ const FormBuilder: FunctionalComponent = () => {
         <oj-c-button
           onojAction={addCheckbox}
           label="Add Checkbox Group"
+          style="margin-right: 10px;"
+        ></oj-c-button>
+        <oj-c-button
+          onojAction={addSelectSingle}
+          label="Add Select Dropdown"
           style="margin-right: 10px;"
         ></oj-c-button>
       </div>
@@ -129,6 +154,14 @@ const FormBuilder: FunctionalComponent = () => {
                   <oj-c-checkbox key={index} label-hint={option}></oj-c-checkbox>
                 ))}
               </div>
+            )}
+            {element.type === "select-single" && (
+              <oj-c-select-single
+                item-text="label"
+                label-hint={`select browser`}
+                class="oj-form-control-max-width-md"
+                data={browsersDP}
+              ></oj-c-select-single>
             )}
             {/* Delete button */}
             <oj-c-button
