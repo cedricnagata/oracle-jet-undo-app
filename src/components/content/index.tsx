@@ -6,7 +6,7 @@
  * @ignore
  */
 import { h } from "preact";
-import { FormBuilder } from "./form-builder";
+import FormBuilder from "./form-builder";
 
 export function Content() {
   return (
