@@ -2,18 +2,9 @@
 import "oj-c/form-layout";
 import "oj-c/input-text";
 import "oj-c/text-area";
-import "oj-c/checkbox";
-import "oj-c/select-single";
 import "oj-c/button";
 import { FunctionalComponent, h } from "preact";
 import { useState } from "preact/hooks";
-import ArrayDataProvider = require("ojs/ojarraydataprovider")
-
-const dropdownOptions = new ArrayDataProvider([
-  { value: "Option1", label: "Option 1" },
-  { value: "Option2", label: "Option 2" },
-  { value: "Option3", label: "Option 3" },
-], { keyAttributes: "value" });
 
 // Define the FormBuilder Component
 const FormBuilder: FunctionalComponent = () => {
@@ -29,14 +20,9 @@ const FormBuilder: FunctionalComponent = () => {
     setFormElements([...formElements, { id: `TextArea-${formElements.length + 1}`, type: "textarea" }]);
   };
 
-  // Function to add a new checkbox field
-  const addCheckbox = () => {
-    setFormElements([...formElements, { id: `Checkbox-${formElements.length + 1}`, type: "checkbox" }]);
-  };
-
-  // Function to add a new dropdown field
-  const addDropdown = () => {
-    setFormElements([...formElements, { id: `Dropdown-${formElements.length + 1}`, type: "dropdown" }]);
+  // Function to delete a form element
+  const deleteElement = (id: string) => {
+    setFormElements(formElements.filter((element) => element.id !== id));
   };
 
   return (
@@ -53,58 +39,34 @@ const FormBuilder: FunctionalComponent = () => {
         <oj-c-button
           onojAction={addTextArea}
           label="Add Text Area"
-          style="margin-right: 10px;"
-        ></oj-c-button>
-        <oj-c-button
-          onojAction={addCheckbox}
-          label="Add Checkbox"
-          style="margin-right: 10px;"
-        ></oj-c-button>
-        <oj-c-button
-          onojAction={addDropdown}
-          label="Add Dropdown"
         ></oj-c-button>
       </div>
 
       {/* Form Layout to organize the fields */}
       <oj-c-form-layout direction="column">
-        {formElements.map((element) => {
-          if (element.type === "input") {
-            return (
+        {formElements.map((element) => (
+          <div key={element.id} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Render appropriate form element */}
+            {element.type === "input" && (
               <oj-c-input-text
-                key={element.id}
                 label-hint={`Field ${element.id}`}
                 placeholder={`Enter value for ${element.id}`}
               ></oj-c-input-text>
-            );
-          } else if (element.type === "textarea") {
-            return (
+            )}
+            {element.type === "textarea" && (
               <oj-c-text-area
-                key={element.id}
                 label-hint={`Field ${element.id}`}
                 placeholder={`Enter value for ${element.id}`}
               ></oj-c-text-area>
-            );
-          } else if (element.type === "checkbox") {
-            return (
-              <oj-c-checkbox
-                key={element.id}
-                label-hint={`Option ${element.id}`}
-              ></oj-c-checkbox>
-            );
-          } else if (element.type === "dropdown") {
-            return (
-              <oj-c-select-single
-                key={element.id}
-                label-hint={`Select ${element.id}`}
-                placeholder="Choose an option"
-                value=""
-                data={dropdownOptions}
-              ></oj-c-select-single>
-            );
-          }
-          return null;
-        })}
+            )}
+            {/* Delete button */}
+            <oj-c-button
+              onojAction={() => deleteElement(element.id)}
+              label="Delete"
+              chroming="outlined"
+            ></oj-c-button>
+          </div>
+        ))}
       </oj-c-form-layout>
     </div>
   );
